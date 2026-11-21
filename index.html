@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://ivdfjstwznfiukpbgjrj.supabase.co; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>MACROMANIA</title>
+<style>
+:root {
+  --bg: #FFF8EA;
+  --ink: #16120E;
+  --yellow: #FFCB05;
+  --edge: #C49A00;
+  --field: #FFFFFF;
+  --line: #16120E;
+  --placeholder: #5C5348;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16120E;
+    --ink: #FFF8EA;
+    --yellow: #FFCB05;
+    --edge: #A67C00;
+    --field: #2A231C;
+    --line: #FFF8EA;
+    --placeholder: #E4D5C0;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html { height: 100%; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding:
+    max(28px, env(safe-area-inset-top))
+    max(22px, env(safe-area-inset-right))
+    max(28px, env(safe-area-inset-bottom))
+    max(22px, env(safe-area-inset-left));
+}
+form {
+  width: 100%;
+  max-width: 346px;
+  margin-bottom: 6vh;
+}
+h1 {
+  margin: 0;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-weight: 900;
+  font-stretch: condensed;
+  font-size: clamp(2.7rem, 12.8vw, 3.2rem);
+  line-height: 0.88;
+  letter-spacing: -0.015em;
+}
+p.s {
+  margin: 14px 0 26px;
+  color: var(--ink);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.011em;
+}
+input {
+  display: block;
+  width: 100%;
+  height: 56px;
+  margin: 0;
+  padding: 0 16px;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  background: var(--field);
+  color: var(--ink);
+  font: inherit;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  caret-color: var(--ink);
+  -webkit-appearance: none;
+  appearance: none;
+}
+input:placeholder-shown { letter-spacing: 0.01em; }
+input::placeholder { color: var(--placeholder); opacity: 1; }
+input:focus,
+input:focus-visible {
+  outline: none;
+  border-width: 3px;
+}
+input:-webkit-autofill {
+  -webkit-text-fill-color: var(--ink);
+  caret-color: var(--ink);
+  box-shadow: 0 0 0 1000px var(--field) inset;
+}
+button {
+  display: block;
+  width: 100%;
+  height: 58px;
+  margin: 16px 0 0;
+  padding: 0 18px 2px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--yellow);
+  color: #16120E;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-weight: 900;
+  font-stretch: condensed;
+  font-size: 1.7rem;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 7px 0 var(--edge);
+  transform: translateY(0);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+button:focus { outline: none; }
+button:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 4px;
+}
+button:active {
+  transform: translateY(7px);
+  box-shadow: 0 0 0 var(--edge);
+}
+button:disabled { cursor: default; }
+button:disabled:active {
+  transform: none;
+  box-shadow: 0 7px 0 var(--edge);
+}
+#m {
+  min-height: 1.4em;
+  margin: 20px 0 0;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+::selection { background: #FFCB05; color: #16120E; }
+</style>
+</head><body>
+<!-- Public page: a passcode form and nothing else. No health data, no plan, no app code lives here.
+     The app and every number load from the API only after the server accepts the passcode. -->
+<form id="f" hidden autocomplete="on">
+  <h1>MACROMANIA</h1>
+  <p class="s">Private. Enter your passcode.</p>
+  <input id="p" type="password" autocomplete="current-password" placeholder="Passcode" aria-label="Passcode" required>
+  <button id="b" type="submit">Enter</button>
+  <p id="m" role="status"></p>
+</form>
+<script>
+var API="https://ivdfjstwznfiukpbgjrj.supabase.co/functions/v1/macromania";
+var f=document.getElementById("f"),m=document.getElementById("m"),b=document.getElementById("b");
+function show(msg){f.hidden=false;m.textContent=msg||"";b.disabled=false;b.textContent="Enter";document.getElementById("p").focus()}
+function boot(tok){
+  fetch(API+"/api/app",{headers:{Authorization:"Bearer "+tok}})
+    .then(function(r){if(r.status===401){try{localStorage.removeItem("mm_token")}catch(e){}throw new Error("again")}if(!r.ok)throw new Error("down");return r.json()})
+    .then(function(j){document.open();document.write(j.html.replace("<head>",'<head><script>window.MM_API='+JSON.stringify(API)+'<\/script>'));document.close()})
+    .catch(function(e){show(e.message==="again"?"":"Can't reach the server. Try again in a minute.")});
+}
+f.onsubmit=function(ev){
+  ev.preventDefault();b.disabled=true;b.textContent="Checking…";m.textContent="";
+  fetch(API+"/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({passcode:document.getElementById("p").value})})
+    .then(function(r){return r.json().then(function(j){return{s:r.status,j:j}})})
+    .then(function(x){
+      if(x.s===200&&x.j.token){try{localStorage.setItem("mm_token",x.j.token)}catch(e){}boot(x.j.token)}
+      else show(x.j.error||"Wrong passcode.");
+    }).catch(function(){show("Can't reach the server. Try again in a minute.")});
+};
+var t=null;try{t=localStorage.getItem("mm_token")}catch(e){}
+if(t)boot(t);else show();
+</script>
+</body></html>
